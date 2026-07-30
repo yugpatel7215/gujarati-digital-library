@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ResourceType {
+  PDF
+  EXTERNAL_LINK
+}
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model Admin {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+
+  role         AdminRole  @default(ADMIN)
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  resources    Resource[]
+
+  @@map("admins")
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  icon        String?
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  resources   Resource[]
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Resource {
+  id           String       @id @default(cuid())
+
+  title        String
+  slug         String       @unique
+  description  String?
+
+  language     String
+
+  type         ResourceType
+
+  pdfUrl       String?
+  externalUrl  String?
+
+  coverImage   String?
+
+  fileSize     BigInt?
+  pageCount    Int?
+
+  downloads    Int          @default(0)
+  views         Int          @default(0)
+
+  isPublished  Boolean      @default(true)
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  categoryId   String
+  category     Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  createdBy    String
+  admin        Admin        @relation(fields: [createdBy], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([createdBy])
+  @@index([isPublished])
+  @@index([createdAt])
+
+  @@map("resources")
+}
