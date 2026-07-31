@@ -39,3 +39,24 @@ export async function deleteCategory(id: string) {
 
   revalidatePath("/admin/categories");
 }
+
+export async function updateCategory(
+  id: string,
+  formData: FormData
+) {
+  const name = formData.get("name")?.toString().trim();
+
+  if (!name) {
+    throw new Error("Category name is required.");
+  }
+
+  const slug = createSlug(name);
+
+  await categoryRepository.update(id, {
+    name,
+    slug,
+  });
+
+  revalidatePath("/admin/categories");
+  revalidatePath(`/admin/categories/${id}/edit`);
+}
