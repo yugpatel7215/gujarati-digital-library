@@ -29,28 +29,14 @@ model Admin {
 
   role         AdminRole  @default(ADMIN)
 
+  lastLogin    DateTime?
+
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
   resources    Resource[]
 
   @@map("admins")
-}
-
-model Category {
-  id          String     @id @default(cuid())
-  name        String     @unique
-  slug        String     @unique
-  description String?
-  icon        String?
-
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  resources   Resource[]
-
-  @@index([slug])
-  @@map("categories")
 }
 
 model Resource {
@@ -93,4 +79,22 @@ model Resource {
   @@index([createdAt])
 
   @@map("resources")
+}
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  icon        String?
+
+  isActive    Boolean    @default(true)
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  resources   Resource[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("categories")
 }
