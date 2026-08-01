@@ -1,25 +1,17 @@
 import CategoryCard from "./CategoryCard";
 
-export default function CategoryGrid() {
-  const categories = [
-    {
-      name: "Bhajan",
-      description: "Gujarati devotional songs.",
-    },
-    {
-      name: "Chalisa",
-      description: "Popular Hindu chalisas.",
-    },
-    {
-      name: "Aarti",
-      description: "Daily aarti collection.",
-    },
-    {
-      name: "Books",
-      description: "Religious books and scriptures.",
-    },
-  ];
+type CategoryGridProps = {
+  categories: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+  }[];
+};
 
+export default function CategoryGrid({
+  categories,
+}: CategoryGridProps) {
   return (
     <section>
       <div className="mb-8">
@@ -35,9 +27,10 @@ export default function CategoryGrid() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {categories.map((category) => (
           <CategoryCard
-            key={category.name}
+            key={category.id}
             name={category.name}
-            description={category.description}
+            slug={category.slug}
+            description={category.description ?? ""}
           />
         ))}
       </div>

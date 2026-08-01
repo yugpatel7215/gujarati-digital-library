@@ -32,12 +32,7 @@ export async function createCategory(formData: FormData): Promise<void> {
   });
 
   revalidatePath("/admin/categories");
-}
-
-export async function deleteCategory(id: string) {
-  await categoryRepository.delete(id);
-
-  revalidatePath("/admin/categories");
+  revalidatePath("/");
 }
 
 export async function updateCategory(
@@ -50,13 +45,28 @@ export async function updateCategory(
     throw new Error("Category name is required.");
   }
 
-  const slug = createSlug(name);
+  const description =
+    formData.get("description")?.toString().trim() || undefined;
+
+  const icon =
+    formData.get("icon")?.toString().trim() || undefined;
 
   await categoryRepository.update(id, {
     name,
-    slug,
+    slug: createSlug(name),
+    description,
+    icon,
   });
 
   revalidatePath("/admin/categories");
   revalidatePath(`/admin/categories/${id}/edit`);
+  revalidatePath("/");
 }
+
+export async function toggleCategoryActive(id: string) {
+  await categoryRepository.toggleActive(id);
+
+  revalidatePath("/admin/categories");
+  revalidatePath("/");
+}
+

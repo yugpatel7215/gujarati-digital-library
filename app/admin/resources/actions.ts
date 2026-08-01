@@ -10,52 +10,54 @@ import { resourceRepository } from "@/lib/resource-repository";
 const RESOURCE_TYPES = new Set(Object.values(ResourceType));
 
 function createSlug(text: string) {
-    return text
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-");
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
 }
 
 export async function createResource(formData: FormData) {
-    const session = await auth();
+  const session = await auth();
 
-    if (!session?.user?.id) {
-        throw new Error("Unauthorized");
-    }
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
 
-    const title = formData.get("title")?.toString().trim();
-    const language = formData.get("language")?.toString().trim();
-    const author = formData.get("author")?.toString().trim();
-    const categoryId = formData.get("categoryId")?.toString();
-    const typeValue = formData.get("type")?.toString();
-    const description = formData.get("description")?.toString().trim();
-    const thumbnailUrl = formData.get("thumbnailUrl")?.toString().trim();
-    const fileUrl = formData.get("fileUrl")?.toString().trim();
-    const externalUrl = formData.get("externalUrl")?.toString().trim();
-    if (!title || !language || !categoryId || !typeValue) {
-        throw new Error("Missing required fields.");
-    }
+  const title = formData.get("title")?.toString().trim();
+  const language = formData.get("language")?.toString().trim();
+  const author = formData.get("author")?.toString().trim();
+  const categoryId = formData.get("categoryId")?.toString();
+  const typeValue = formData.get("type")?.toString();
+  const description = formData.get("description")?.toString().trim();
+  const thumbnailUrl = formData.get("thumbnailUrl")?.toString().trim();
+  const fileUrl = formData.get("fileUrl")?.toString().trim();
+  const externalUrl = formData.get("externalUrl")?.toString().trim();
+  if (!title || !language || !categoryId || !typeValue) {
+    throw new Error("Missing required fields.");
+  }
 
-    if (!RESOURCE_TYPES.has(typeValue as ResourceType)) {
-        throw new Error("Invalid resource type.");
-    }
+  if (!RESOURCE_TYPES.has(typeValue as ResourceType)) {
+    throw new Error("Invalid resource type.");
+  }
 
-    await resourceRepository.create({
-        title,
-        slug: createSlug(title),
-        description,
-        author,
-        language,
-        type: typeValue as ResourceType,
-        fileUrl,
-        externalUrl,
-        thumbnailUrl,
-        categoryId,
-        createdBy: session.user.id,
-    });
+  await resourceRepository.create({
+    title,
+    slug: createSlug(title),
+    description,
+    author,
+    language,
+    type: typeValue as ResourceType,
+    fileUrl,
+    externalUrl,
+    thumbnailUrl,
+    categoryId,
+    createdBy: session.user.id,
+  });
 
-    revalidatePath("/admin/resources");
+  revalidatePath("/admin/resources");
+
+  redirect("/admin/resources");
 }
 
 export async function deleteResource(id: string) {

@@ -9,6 +9,17 @@ export class CategoryRepository {
     });
   }
 
+  async getPublishedCategories() {
+    return prisma.category.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
+
   async getById(id: string) {
     return prisma.category.findUnique({
       where: {
@@ -46,16 +57,31 @@ export class CategoryRepository {
     });
   }
 
-  async delete(id: string) {
+  async toggleActive(id: string) {
+    const category = await prisma.category.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        isActive: true,
+      },
+    });
+
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
     return prisma.category.update({
       where: {
         id,
       },
       data: {
-        isActive: false,
+        isActive: !category.isActive,
       },
     });
   }
+
+  
 }
 
 export const categoryRepository = new CategoryRepository();

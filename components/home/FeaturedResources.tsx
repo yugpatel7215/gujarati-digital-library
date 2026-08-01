@@ -1,6 +1,6 @@
 import ResourceCard from "./ResourceCard";
 
-interface LatestResourcesProps {
+interface FeaturedResourcesProps {
   resources: {
     id: string;
     title: string;
@@ -12,18 +12,22 @@ interface LatestResourcesProps {
   }[];
 }
 
-export default function LatestResources({
+export default function FeaturedResources({
   resources,
-}: LatestResourcesProps) {
+}: FeaturedResourcesProps) {
+  if (resources.length === 0) {
+    return null;
+  }
+
   return (
     <section className="mt-20">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900">
-          Latest Resources
+          Featured Resources
         </h2>
 
         <p className="mt-2 text-gray-600">
-          Recently added resources.
+          Hand-picked resources recommended by our editors.
         </p>
       </div>
 

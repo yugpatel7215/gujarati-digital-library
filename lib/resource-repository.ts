@@ -124,6 +124,151 @@ export class ResourceRepository {
       },
     });
   }
+  async getPublishedResources() {
+    return prisma.resource.findMany({
+      where: {
+        isPublished: true,
+        category: {
+          isActive: true,
+        },
+      },
+      include: {
+        category: true,
+      },
+      orderBy: [
+        {
+          sortOrder: "asc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
+  }
+
+  async getLatestResources(limit = 8) {
+    return prisma.resource.findMany({
+      where: {
+        isPublished: true,
+        category: {
+          isActive: true,
+        },
+      },
+      include: {
+        category: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+    });
+  }
+
+  async getFeaturedResources(limit = 6) {
+    return prisma.resource.findMany({
+      where: {
+        isPublished: true,
+        isFeatured: true,
+        category: {
+          isActive: true,
+        },
+      },
+      include: {
+        category: true,
+      },
+      orderBy: [
+        {
+          sortOrder: "asc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+      take: limit,
+    });
+  }
+
+  async getResourcesByCategorySlug(categorySlug: string) {
+    return prisma.resource.findMany({
+      where: {
+        isPublished: true,
+        category: {
+          slug: categorySlug,
+          isActive: true,
+        },
+      },
+      include: {
+        category: true,
+      },
+      orderBy: [
+        {
+          sortOrder: "asc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
+  }
+  async getResourceBySlug(slug: string) {
+    return prisma.resource.findUnique({
+      where: {
+        slug,
+      },
+      include: {
+        category: true,
+        admin: true,
+      },
+    });
+  }
+  async searchResources(query: string) {
+  return prisma.resource.findMany({
+    where: {
+      isPublished: true,
+      category: {
+        isActive: true,
+      },
+      OR: [
+        {
+          title: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          author: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          language: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+      ],
+    },
+    include: {
+      category: true,
+    },
+    orderBy: [
+      {
+        sortOrder: "asc",
+      },
+      {
+        createdAt: "desc",
+      },
+    ],
+  });
 }
+}
+
 
 export const resourceRepository = new ResourceRepository();
